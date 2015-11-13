@@ -431,11 +431,11 @@ function getAttyCases() {
     var appSettings = ss.getSheetByName("appSettings");
     if (appSettings === null) {
       appSettings = ss.insertSheet();
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       appSettings.hideSheet();
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       appSettings.setName("appSettings");
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
     }
     
     //loop through every sheet and remove extraneous sheets
@@ -613,9 +613,9 @@ function dmPrimary() {
       
       // delete the current follow up sheet
       try {
-        Utilities.sleep(1000);
+        Utilities.sleep(500);
         ss.deleteSheet(sheet);
-        Utilities.sleep(1000);
+        Utilities.sleep(500);
         msg = "current follow up sheet deleted: " + follow_up_sheet_name;
         myLogger(msg);
       } catch (err) {
@@ -683,7 +683,7 @@ function dmPrimary() {
         
         caseRemCount = case_list_remaining.length;
         followUp( case_list_remaining );
-        Utilities.sleep(1000);
+        Utilities.sleep(500);
         
       }
       
@@ -738,32 +738,32 @@ function dmPrimary() {
       case_list_sheet = ss.getSheetByName("case_list_sheet");
       if (case_list_sheet !== null) {
         ss.deleteSheet(ss.getSheetByName("case_list_sheet"));
-        Utilities.sleep(1000);
+        Utilities.sleep(500);
       }
       
       case_list_sheet = ss.getSheetByName("case_list_sheet");
       if (case_list_sheet === null) {
         case_list_sheet = ss.insertSheet();
-        Utilities.sleep(1000);
+        Utilities.sleep(500);
         case_list_sheet.setName("case_list_sheet");
-        Utilities.sleep(1000);
+        Utilities.sleep(500);
       }
       
       sheet = ss.getSheetByName("case_list_sheet");
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       var listRange = sheet.getRange(1, 1, case_list.length, case_list[0].length);
       listRange.setValues(case_list);
       
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       
       currTime = (new Date()).getTime();
       timeLimitIsNear = (currTime - script_start >= max_running_time);
       if ( timeLimitIsNear ) {
         myLogger("timeLimitIsNear fired before processing a case");
         followUp( case_list );
-        Utilities.sleep(1000);
+        Utilities.sleep(500);
         ss.deleteSheet(case_list_sheet);
-        Utilities.sleep(1000);
+        Utilities.sleep(500);
         wrapUp(script_name, script_start, caseCount, caseAddedCount, caseRemCount, caseUpdateCount, caseAttachmentCount);
         return false;
       }
@@ -777,7 +777,7 @@ function dmPrimary() {
       
       // remove the case list sheet
       ss.deleteSheet(ss.getSheetByName("case_list_sheet"));
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       
       currTime = '';
       timeLimitIsNear = '';
@@ -820,7 +820,7 @@ function dmPrimary() {
         
         caseRemCount = case_list_remaining.length;        
         followUp( case_list_remaining );        
-        Utilities.sleep(1000);
+        Utilities.sleep(500);
         
       }
       
@@ -856,9 +856,9 @@ function processAtty( barNo, atty, attyEmail ) {
     
     if (attySheet === null) {
       attySheet = ss.insertSheet();
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       attySheet.setName(barNo);
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
     }
     
     attySheet = ss.getSheetByName(barNo);
@@ -908,7 +908,7 @@ function processAtty( barNo, atty, attyEmail ) {
         }
         msg = "no response, retrying fetch";
         myLogger(msg);
-        Utilities.sleep(1000);
+        Utilities.sleep(500);
         response = UrlFetchApp.fetch(String(getDataURL), fetchOptions).getContentText();
       }
       
@@ -1049,11 +1049,11 @@ function processCase( caseNo, atty, attyEmail ) {
     var appSettings = ss.getSheetByName("appSettings");
     if (appSettings === null) {
       appSettings = ss.insertSheet();
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       appSettings.hideSheet();
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       appSettings.setName("appSettings");
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
     }
     var AppSubFolderId = getSettings('AppSubFolderId');
     var AppSubFolder = DriveApp.getFolderById(AppSubFolderId);
@@ -1356,11 +1356,11 @@ function followUp( case_list_remaining ) {
     var appSettings = ss.getSheetByName("appSettings");
     if (appSettings === null) {
       appSettings = ss.insertSheet();
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       appSettings.hideSheet();
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       appSettings.setName("appSettings");
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
     }
     var dateTime = Utilities.formatDate(new Date(), "America/Chicago", "yyyyMMddHHmmss");
     var tempName = String(dateTime + 'folUp');
@@ -1368,21 +1368,21 @@ function followUp( case_list_remaining ) {
     //create a sheet & name it
     var case_list_rem_sheet = ss.getSheetByName(tempName);
     if (case_list_rem_sheet !== null) {
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       ss.deleteSheet(ss.getSheetByName(tempName));
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
     }
     
     case_list_rem_sheet = ss.insertSheet();
-    Utilities.sleep(1000);
+    Utilities.sleep(500);
     case_list_rem_sheet.setName(tempName);
-    Utilities.sleep(1000);
+    Utilities.sleep(500);
     
     var follow_up_sheet_name;
     
     try {
       follow_up_sheet_name = case_list_rem_sheet.getSheetName();
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
     } catch (err) {
       msg = "follow_up_sheet_name error\n";
       msg = "follow_up_sheet_name = case_list_rem_sheet.getSheetName() failed";
@@ -1391,7 +1391,7 @@ function followUp( case_list_remaining ) {
     
     if (!follow_up_sheet_name) {
       case_list_rem_sheet = ss.getSheetByName(tempName);
-      Utilities.sleep(1000);
+      Utilities.sleep(500);
       follow_up_sheet_name = tempName;
     }
     
