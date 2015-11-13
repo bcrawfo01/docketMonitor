@@ -18,8 +18,8 @@ Apps Script has [quotas](https://developers.google.com/apps-script/guides/servic
 
 ## Installation
 1. Create a [new Google Sheet](http://spreadsheets.google.com/ccc?new), and open the script editor (Tools > Script editor). If you see a new script dialog, select the Blank Project option.
-2. Delete the default code. Copy the code from docketMonitor.gs and paste it into the script editor. Save the file. Use any name you wish when prompted to name the script.
-3. Create a new html file (File > New > Html file) and name it "help". Delete the default code. Copy the code from help.html and paste it into the script editor. Save the file.
+2. Delete the default code. Copy the code from [docketMonitor.gs](https://github.com/bcrawfo01/docketMonitor/blob/master/docketMonitor.gs) and paste it into the script editor. Save the file. Use any name you wish when prompted to name the script.
+3. Create a new html file (File > New > Html file) and name it "help". Delete the default code. Copy the code from [help.html](https://github.com/bcrawfo01/docketMonitor/blob/master/help.html) and paste it into the script editor. Save the file.
 4. Select the Code.gs tab, then select Run > initializeAuth and grant the script authorization.
 5. Select Run > setup.
 6. Close the script editor.
