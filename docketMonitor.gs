@@ -332,9 +332,7 @@ function removeInvalidSheets() {
       
       if (sheetName === "log") { continue; }
       if (sheet.isSheetHidden()) { continue; }
-      if ( sheetName.indexOf("etting") >= 0 ) {
-        continue;
-      }
+      if ( sheetName.indexOf("etting") >= 0 ) { continue; }
       
       if ( sheetName.indexOf("folUp") >= 0 ) {
         ss.deleteSheet(ss.getSheetByName(sheetName));
@@ -438,12 +436,6 @@ function getAttyCases() {
       Utilities.sleep(500);
     }
     
-    //loop through every sheet and remove extraneous sheets
-    removeInvalidSheets();
-    
-    // delete any follow up remaining from previous day
-    removeSettings('follow_up_cases');
-    
     var settings = getColumnsData(ss.getSheetByName( 'settings' ))[0];
     var atty = settings.attorneyName;
     var attyEmail = settings.attorneyEmail;
@@ -454,11 +446,18 @@ function getAttyCases() {
     
     var reEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;  
     var reBarNo = /^(AR)([0-9]{3,8})$/i;
-    if ( (typeof atty === "undefined") || !atty || (!reEmail.test(attyEmail)) || (!reBarNo.test(barNo)) ) {
+    if ( (typeof atty === "undefined") || !atty || (atty === 'AR') || (!reEmail.test(attyEmail)) || (!reBarNo.test(barNo)) ) {
       help();
       return;
     }
     
+    //loop through every sheet and remove extraneous sheets
+    removeInvalidSheets();
+    
+    // delete any follow up remaining from previous day
+    removeSettings('follow_up_cases');
+    
+    // generate case list
     processAtty(barNo, atty, attyEmail);
     
     var caseCount, caseAddedCount, caseRemCount, caseUpdateCount, caseAttachmentCount;
@@ -549,7 +548,7 @@ function dmPrimary() {
     
     var reEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;  
     var reBarNo = /^(AR)([0-9]{3,8})$/i;
-    if ( (typeof atty === "undefined") || !atty || (!reEmail.test(attyEmail)) || (!reBarNo.test(barNo)) ) {
+    if ( (typeof atty === "undefined") || !atty || (atty === 'AR') || (!reEmail.test(attyEmail)) || (!reBarNo.test(barNo)) ) {
       help();
       return;
     }
@@ -568,8 +567,8 @@ function dmPrimary() {
     
     var send_updates = getSettings("send_updates");
     if ( send_updates === false ) {
-      subject = "dm email updates disabled";
-      body = "dm email updates are disabled!";
+      subject = "docket montior email updates disabled";
+      body = "docket montior email updates are disabled!";
       MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: subject, body: body + "\nSheet:\n" + AppUrl});
     }
     
@@ -1251,7 +1250,7 @@ function processAttachments( caseNo, atty, pCaseText, caseResponse ) {
     while (arrMatch = docPattern.exec( d )) {
       
       cAttCount++;
-      if ( cAttCount.length > 15 ) {
+      if ( cAttCount.length > 20 ) {
         msg = caseNo + ": attachment error - excessive number of attachments detected (" + atty + ")";
         myLogger(msg);
         break;
