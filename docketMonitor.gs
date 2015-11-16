@@ -23,9 +23,11 @@ function onOpen() {
 
 
 function help() {
+  
+  var content = UrlFetchApp.fetch('https://www.dynamicpractices.com/apps/docketMonitor/help.html', fetchOptions);
   var ss = SpreadsheetApp.getActive();
-  var html = HtmlService.createHtmlOutputFromFile('help')
-  .setTitle("docket monitor help")
+  var html = HtmlService.createHtmlOutput(String(content))
+  .setTitle("help")
   .setWidth(400)
   .setHeight(400);
   ss.show(html);
@@ -395,7 +397,7 @@ var sheet, sheetName, numRows, numCols, dataRange, values, r, k;
 
 var trigger_delay_mins = 5;
 
-var max_running_time_mins = 5.0;
+var max_running_time_mins = 5.1;
 var max_running_time = 1000 * 60 * max_running_time_mins;
 var timeLimitIsNear, currTime;
 
@@ -421,9 +423,6 @@ function getAttyCases() {
     var script_name = 'getAttyCases';
     msg = script_name + ' running';
     myLogger(msg);
-    
-    // stop the script on Saturday and Sunday
-    if (((new Date().getDay()) === 6) || ((new Date().getDay()) === 0)) return;
     
     var ss = SpreadsheetApp.getActive();
     var appSettings = ss.getSheetByName("appSettings");
