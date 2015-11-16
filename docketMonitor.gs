@@ -459,6 +459,8 @@ function getAttyCases() {
     // generate case list
     processAtty(barNo, atty, attyEmail);
     
+    ss.setActiveSheet(ss.getSheetByName('settings'));
+    
     var caseCount, caseAddedCount, caseRemCount, caseUpdateCount, caseAttachmentCount;
     caseCount = caseAddedCount = caseRemCount = caseUpdateCount = caseAttachmentCount = 0;
     wrapUp(script_name, script_start, caseCount, caseAddedCount, caseRemCount, caseUpdateCount, caseAttachmentCount);
