@@ -4,9 +4,9 @@ automated case alerts using Google Apps Script
 
 
 ## Overview
-This script is designed to help attorneys keep track of case events using [public CourtConnect](https://caseinfo.aoc.arkansas.gov/cconnect/PROD/public/ck_public_qry_main.cp_main_idx). The script monitors cases on CourtConnect and sends email alerts when entries are added or removed from a docket page.
+This script is designed to help attorneys keep track of case events using [public CourtConnect](https://caseinfo.aoc.arkansas.gov/cconnect/PROD/public/ck_public_qry_main.cp_main_idx). The script monitors cases for an individual attorney on CourtConnect and sends email alerts when entries are added or removed from a docket page.
  * It checks for any new cases once a day and sends an email alert when cases are added
- * It checks every case for an individual attorney twice a day and sends an email alert if new entries are added or old entries are modified or removed
+ * It checks every case twice a day and sends an email alert if new entries are added or old entries are modified or removed
  * Any scanned documents added to a docket page are attached to alert emails
 
 
@@ -27,6 +27,7 @@ Apps Script has [quotas](https://developers.google.com/apps-script/guides/servic
 
 That’s it. You can close the sheet. Everything else is automated.
 
+[(YouTube video of installation process)](https://youtu.be/Pf-myw_do9w)
 
 
 ## Removing the script
