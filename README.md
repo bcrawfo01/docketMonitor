@@ -11,7 +11,7 @@ This script is designed to help attorneys keep track of case events using [publi
 
 
 ## Limitations
-The script depends on Google's servers so if [Google experiences performance issues](https://www.google.com/appsstatus), the script will experience errors. 
+The script depends on Google's servers and CourtConnect’s servers so if either [Google](https://www.google.com/appsstatus) or CourtConnect experience performance or maintenance issues, the script will generate errors.<br> 
 Apps Script has [quotas](https://developers.google.com/apps-script/guides/services/quotas). Attorneys with a substantial number of cases might hit quota limitations. You might also hit quota limitations if you use a free Google account. 
 
 
