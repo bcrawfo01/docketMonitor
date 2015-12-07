@@ -18,7 +18,7 @@ Apps Script has [quotas](https://developers.google.com/apps-script/guides/servic
 
 ## Installation
 <p><i>Method 1 (easier method):</i></p>
-1. Open [this spreadsheet](https://docs.google.com/spreadsheets/d/1_20QFJNNWEYpGvjbX8UjWZnuAYRCp-QE3Xc20rJJjVk/edit?usp=sharing), and make a copy (File > Make a copy...).
+1. Open [this Google sheet](https://docs.google.com/spreadsheets/d/1_20QFJNNWEYpGvjbX8UjWZnuAYRCp-QE3Xc20rJJjVk/edit?usp=sharing), and make a copy (File > Make a copy...).
 2. Refresh the new Google Sheet. Once you refresh the sheet, the script will add a custom menu named "Docket Monitor" to the menu bar.
 3. Run setup (Docket Monitor > setup) and grant the script authorization.
 4. Review the help file (Docket Monitor > help) and add your information to the settings sheet.
