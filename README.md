@@ -33,9 +33,13 @@ Apps Script has [quotas](https://developers.google.com/apps-script/guides/servic
 6. Review the help file (Docket Monitor > help) and add your information to the settings sheet.
 7. Update your case list (Docket Monitor > update case list).
 
+<p>&nbsp;[YouTube video of installation process](https://youtu.be/Pf-myw_do9w)</p>
+
+
 That’s it. You can close the sheet. Everything else is automated.
 
-[(YouTube video of installation process)](https://youtu.be/Pf-myw_do9w)
+
+Optional: [Sign up](http://github-file-watcher.com/?repository=bcrawfo01/docketMonitor&glob=*) to receive email alerts when this repo is updated.
 
 
 ## Removing the script
