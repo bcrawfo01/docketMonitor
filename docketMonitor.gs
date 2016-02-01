@@ -1,18 +1,20 @@
-function initializeAuth() {}
-
-
 function setup() {
   createSettingsSheet();
+  createOtherCasesSheet();
+  createIgnoreCasesSheet();
   createTriggers();
   initializeApp();
   msg = "app initialized";
   myLogger(msg);
+  SpreadsheetApp.getActive().setActiveSheet(ss.getSheetByName('settings'));
 }
+
 
 
 function onOpen() {
   var ui = SpreadsheetApp.getUi();
   ui.createMenu(' ☑ Docket Monitor')
+  .addItem('setup', 'setup')
   .addItem('update case list', 'getAttyCases')
   .addItem('run docket monitor', 'dmProcessLock')
   .addItem('reset', 'resetDM')
@@ -22,19 +24,25 @@ function onOpen() {
 
 
 
-function help() {
-  
-  var content = UrlFetchApp.fetch('https://www.dynamicpractices.com/apps/docketMonitor/help.html', fetchOptions);
-  var ss = SpreadsheetApp.getActive();
-  var html = HtmlService.createHtmlOutput(String(content))
-  .setTitle("help")
-  .setWidth(400)
-  .setHeight(400);
-  ss.show(html);
+function help() {  
+  try {
+    var content = UrlFetchApp.fetch('https://www.dynamicpractices.com/apps/docketMonitor/help.html', fetchOptions);
+    var ss = SpreadsheetApp.getActive();
+    var html = HtmlService.createHtmlOutput(String(content))
+    .setTitle("help")
+    .setWidth(400)
+    .setHeight(400);
+    ss.show(html);
+  } catch (err) { }
 }
 
 
 function createTriggers() {
+  //remove all existing triggers
+  var allTriggers = ScriptApp.getProjectTriggers();
+  for (var i = 0; i < allTriggers.length; i++) {
+    ScriptApp.deleteTrigger(allTriggers[i]);
+  }
   ScriptApp.newTrigger("onOpen").forSpreadsheet(SpreadsheetApp.getActive()).onOpen().create();
   ScriptApp.newTrigger("getAttyCases").timeBased().atHour(8).everyDays(1).create();
   ScriptApp.newTrigger("dmProcessLock").timeBased().atHour(10).everyDays(1).create();
@@ -78,7 +86,7 @@ function createSettingsSheet() {
     
     // set the template values
     var labels = [];
-    labels.push(["Attorney name","",'(see "Help" from the Docket Monitor menu)']);
+    labels.push(["Attorney name","",'(see "help" from the Docket Monitor menu)']);
     labels.push(["Attorney email","",""]);
     labels.push(["Attorney bar number","", ""]);
     labels.push(["Exclude closed cases","FALSE",""]);
@@ -139,7 +147,7 @@ function createSettingsSheet() {
     rangeRef = 'B1:B1';
     range = sheet.getRange(rangeRef);
     range.setBackground('#dff0d8');
-    //range.setFontWeight("bold");
+    
     
     // data validation
     rangeRef = 'B4:B4';
@@ -155,6 +163,128 @@ function createSettingsSheet() {
     msg += "Line: " + err.lineNumber;
     myLogger(msg);
   }
+}
+
+
+
+function createOtherCasesSheet() {
+  
+  try {
+    
+    var ss = SpreadsheetApp.getActive();
+    var sheet = ss.getSheetByName( 'other cases' );
+    if (sheet === null) {
+      sheet = ss.insertSheet();
+      Utilities.sleep(500);
+      sheet.setName( 'other cases' );
+      Utilities.sleep(500);
+    } else { 
+      sheet.clear();
+      Utilities.sleep(500);
+    }    
+    
+    // set the template values
+    var labels = [];
+    labels.push(["Case number"]);
+    
+    sheet.getRange(1,1,(labels.length),(labels[0].length)).setValues(labels);    
+    
+    // delete empty rows and columns
+    var maxRows = sheet.getMaxRows();
+    var lastRow = sheet.getLastRow();
+    if ( (maxRows !== 1) && (maxRows !== lastRow) ) {
+      sheet.deleteRows(lastRow+19, maxRows-(lastRow+19));
+      Utilities.sleep(500);
+    } else {
+      sheet.deleteRows(10, maxRows-10);
+      Utilities.sleep(500);
+    }
+    
+    var maxCols = sheet.getMaxColumns();
+    var lastCol = sheet.getLastColumn();
+    sheet.deleteColumns(lastCol+1, maxCols-lastCol);
+    
+    // set column width
+    sheet.setColumnWidth(1, 200);
+    
+    // set background and font colors
+    var rangeRef, range;
+    
+    rangeRef = 'A1';
+    range = sheet.getRange(rangeRef);
+    range.setFontColor("white");
+    range.setBackground("black");
+    range.setFontSize(11);
+    range.setHorizontalAlignment("center");    
+    
+  } catch (err) {
+    msg = "Error: " + err.message + "\n";
+    msg += "Script: " + err.fileName + "\n";
+    msg += "Line: " + err.lineNumber;
+    myLogger(msg);
+  }
+  
+}
+
+
+
+function createIgnoreCasesSheet() {
+  
+  try {
+    
+    var ss = SpreadsheetApp.getActive();
+    var sheet = ss.getSheetByName( 'ignore cases' );
+    if (sheet === null) {
+      sheet = ss.insertSheet();
+      Utilities.sleep(500);
+      sheet.setName( 'ignore cases' );
+      Utilities.sleep(500);
+    } else { 
+      sheet.clear();
+      Utilities.sleep(500);
+    }    
+    
+    // set the template values
+    var labels = [];
+    labels.push(["Case number"]);
+    
+    sheet.getRange(1,1,(labels.length),(labels[0].length)).setValues(labels);    
+    
+    // delete empty rows and columns
+    var maxRows = sheet.getMaxRows();
+    var lastRow = sheet.getLastRow();
+    if ( (maxRows !== 1) && (maxRows !== lastRow) ) {
+      sheet.deleteRows(lastRow+19, maxRows-(lastRow+19));
+      Utilities.sleep(500);
+    } else {
+      sheet.deleteRows(10, maxRows-10);
+      Utilities.sleep(500);
+    }
+    
+    var maxCols = sheet.getMaxColumns();
+    var lastCol = sheet.getLastColumn();
+    sheet.deleteColumns(lastCol+1, maxCols-lastCol);
+    
+    // set column width
+    sheet.setColumnWidth(1, 200);
+    
+    // set background and font colors
+    var rangeRef, range;
+    
+    rangeRef = 'A1';
+    range = sheet.getRange(rangeRef);
+    range.setFontColor("white");
+    range.setBackground("black");
+    range.setFontSize(11);
+    range.setHorizontalAlignment("center");    
+    
+  } catch (err) {
+    msg = "Error: " + err.message + "\n";
+    msg += "Script: " + err.fileName + "\n";
+    msg += "Line: " + err.lineNumber;
+    myLogger(msg);
+  }
+  
 }
 
 
@@ -175,6 +305,8 @@ function initializeApp() {
       appSettings.appendRow(["send_updates", "TRUE"]);
       Utilities.sleep(500);
       appSettings.appendRow(["new_case_updates", "TRUE"]);
+      Utilities.sleep(500);
+      appSettings.appendRow(["email_error_reports", "FALSE"]);
       Utilities.sleep(500);
     }
     var appSettingsValues = appSettings.getDataRange().getValues();
@@ -333,6 +465,8 @@ function removeInvalidSheets() {
       sheetName = sheet.getName();
       
       if (sheetName === "log") { continue; }
+      if (sheetName === "other cases") { continue; }
+      if (sheetName === "ignore cases") { continue; }
       if (sheet.isSheetHidden()) { continue; }
       if ( sheetName.indexOf("etting") >= 0 ) { continue; }
       
@@ -361,7 +495,7 @@ function resetDM() {
   removeInvalidSheets();
   
   
-  //remove fol up triggers
+  //remove all existing triggers
   var allTriggers = ScriptApp.getProjectTriggers();
   for (var i = 0; i < allTriggers.length; i++) {
     ScriptApp.deleteTrigger(allTriggers[i]);
@@ -435,7 +569,7 @@ function getAttyCases() {
       Utilities.sleep(500);
     }
     
-    var settings = getColumnsData(ss.getSheetByName( 'settings' ))[0];
+    var settings = getColumnsData_(ss.getSheetByName( 'settings' ))[0];
     var atty = settings.attorneyName;
     var attyEmail = settings.attorneyEmail;
     var barNo = settings.attorneyBarNumber;
@@ -443,7 +577,7 @@ function getAttyCases() {
     barNo = String(barNo).replace('ARAR', 'AR');
     barNo = String(barNo).replace('AR19', 'AR');
     
-    var reEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;  
+    var reEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)/i;  
     var reBarNo = /^(AR)([0-9]{3,8})$/i;
     if ( (typeof atty === "undefined") || !atty || (atty === 'AR') || (!reEmail.test(attyEmail)) || (!reBarNo.test(barNo)) ) {
       help();
@@ -505,7 +639,7 @@ function dmProcessLock() {
       //create a trigger
       currTime = (new Date()).getTime();
       var waitTime = (1000 * 60 * trigger_delay_mins);
-      var follow_up_trigger = ScriptApp.newTrigger("dmProcessLock").timeBased().at((new Date(currTime + waitTime))).create();
+      ScriptApp.newTrigger("dmProcessLock").timeBased().at((new Date(currTime + waitTime))).create();
       
       msg = "new trigger scheduled for " + new Date(currTime + waitTime);
       myLogger(msg);
@@ -537,7 +671,7 @@ function dmPrimary() {
     myLogger(msg);
     
     var ss = SpreadsheetApp.getActive();
-    var settings = getColumnsData(ss.getSheetByName( 'settings' ))[0];
+    var settings = getColumnsData_(ss.getSheetByName( 'settings' ))[0];
     var adminEmail = settings.attorneyEmail;
     
     var atty = settings.attorneyName;
@@ -547,7 +681,7 @@ function dmPrimary() {
     barNo = String(barNo).replace('ARAR', 'AR');
     barNo = String(barNo).replace('AR19', 'AR');
     
-    var reEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;  
+    var reEmail = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)/i;  
     var reBarNo = /^(AR)([0-9]{3,8})$/i;
     if ( (typeof atty === "undefined") || !atty || (atty === 'AR') || (!reEmail.test(attyEmail)) || (!reBarNo.test(barNo)) ) {
       help();
@@ -557,20 +691,20 @@ function dmPrimary() {
     // stop the script on Saturday and Sunday
     if (((new Date().getDay()) === 6) || ((new Date().getDay()) === 0)) return;
     
-    var AppUrl = SpreadsheetApp.getActive().getUrl();
+    var appUrl = SpreadsheetApp.getActive().getUrl();
     
     var caseNo, rCheck;
     var allSheets = ss.getSheets();
     var sheet, case_list_sheet;
     var case_list = [];
     var case_list_remaining = [];
-    var follow_up_prop, follow_up_info, follow_up_sheet_name, follow_up_trigger_id;
+    var follow_up_prop, follow_up_info, follow_up_sheet_name, follow_up_trigger_id, values;
     
     var send_updates = getSettings("send_updates");
     if ( send_updates === false ) {
-      subject = "docket montior email updates disabled";
-      body = "docket montior email updates are disabled!";
-      MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: subject, body: body + "\nSheet:\n" + AppUrl});
+      var subject = "docket montior case update emails are disabled";
+      var body = "docket montior case update emails are disabled!";
+      MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: subject, body: body + "\nSheet:\n" + appUrl});
     }
     
     //determine if follow up is necessary
@@ -656,14 +790,15 @@ function dmPrimary() {
         
         caseCount++;
         caseNo = values[r][0];
-        barNo = values[r][1];
-        atty = values[r][2];
-        attyEmail = values[r][3];
         
-        rCheck = processCase( caseNo, atty, attyEmail );
+        if ( caseNo === 'Case number' ) {
+          rCheck = "finished";
+        } else {
+          rCheck = processCase( caseNo, atty, attyEmail );
+        }
         
+        // remove the case from the case_list_remaining array
         if ( rCheck === "finished" ) {
-          // remove the case from the case_list_remaining array
           for ( k = (case_list_remaining.length - 1); k >= 0; --k ) {          
             if (case_list_remaining[k][0].indexOf(caseNo) > -1) {
               case_list_remaining.splice(k, 1);
@@ -705,7 +840,7 @@ function dmPrimary() {
           continue;
         }
         
-        if ( (sheet.getName().indexOf("AR") < 0) && (sheet.getName().indexOf("Other cases") < 0) ) { continue; }
+        if ( (sheet.getName().indexOf("AR") < 0) && (sheet.getName().indexOf("ther cases") < 0) ) { continue; }
         
         // iterate through every row/case on the sheet and add it to the case_list array
         if (sheet.getLastRow() === 0) continue;
@@ -715,18 +850,7 @@ function dmPrimary() {
           
           if ( values[r][0].length > 0 ) {
             
-            caseNo = values[r][0];
-            barNo = values[r][1];
-            atty = values[r][2];
-            attyEmail = values[r][3];
-            
-            if (typeof attyEmail === "undefined") {
-              caseNo = values[r][0];
-              atty = values[r][1];
-              attyEmail = values[r][2];
-              barNo = '';
-            }
-            
+            caseNo = values[r][0];            
             case_list.push( [caseNo, barNo, atty, attyEmail] );
             
           }
@@ -797,10 +921,14 @@ function dmPrimary() {
         atty = values[r][2];
         attyEmail = values[r][3];
         
-        rCheck = processCase( caseNo, atty, attyEmail );
+        if ( caseNo === 'Case number' ) {
+          rCheck = "finished";
+        } else {
+          rCheck = processCase( caseNo, atty, attyEmail );
+        }
         
+        // remove the case from the case_list_remaining array
         if ( rCheck === "finished" ) {
-          // remove the case from the case_list_remaining array
           for ( k = (case_list_remaining.length - 1); k >= 0; --k ) {          
             if (case_list_remaining[k][0].indexOf(caseNo) > -1) {
               case_list_remaining.splice(k, 1);
@@ -824,7 +952,7 @@ function dmPrimary() {
         
       }
       
-      //ss.setActiveSheet(ss.getSheetByName('Attorneys'));
+      //ss.setActiveSheet(ss.getSheetByName('settings'));
       case_list_sheet = '';
       sheet = '';
       dataRange = '';
@@ -840,6 +968,12 @@ function dmPrimary() {
     msg += "\nScript: " + err.fileName;
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
+    
+	var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+	var adminEmail = settings.attorneyEmail;
+	var appUrl = SpreadsheetApp.getActive().getUrl();
+	var email_error_reports = getSettings("email_error_reports");
+	if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
   }
   
 }
@@ -880,7 +1014,7 @@ function processAtty( barNo, atty, attyEmail ) {
     var rePattern = new RegExp("case_id=(.*?)&(.*?)<br><b>status:(.*?)<\/i>","gi");    
     
     // fetch a full list of cases by iterating through every page of results
-    // search html for atty's CourtConnect page for case numbers using a regex pattern
+    // search html for case numbers using a regex pattern
     while (nextTest > 0) {
       
       fetch = UrlFetchApp.fetch(String(getDataURL), fetchOptions);
@@ -894,9 +1028,6 @@ function processAtty( barNo, atty, attyEmail ) {
       if ( (!response) || (response === "") ) {
         msg = "no response (" + getDataURL + ")";
         myLogger(msg);
-      } else {        
-        msg = "response found (" + getDataURL + ")";
-        //myLogger(msg);
       }
       
       while ( (!response) || (response === "") ) {
@@ -933,7 +1064,7 @@ function processAtty( barNo, atty, attyEmail ) {
         caseTemp = caseTemp.replace(/case_id=/i, '');
         caseTemp = caseTemp.replace(/&([^]+)/i, '');
         
-        var settings = getColumnsData(ss.getSheetByName( 'settings' ))[0];
+        var settings = getColumnsData_(ss.getSheetByName( 'settings' ))[0];
         var exclude_closed_cases = settings.excludeClosedCases;
         if ( !exclude_closed_cases ) {
           
@@ -1031,6 +1162,12 @@ function processAtty( barNo, atty, attyEmail ) {
     msg += "\nScript: " + err.fileName;
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
+    
+	var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+	var adminEmail = settings.attorneyEmail;
+	var appUrl = SpreadsheetApp.getActive().getUrl();
+	var email_error_reports = getSettings("email_error_reports");
+	if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
   }
 }
 
@@ -1041,26 +1178,40 @@ function processCase( caseNo, atty, attyEmail ) {
   
   try {
     
-    var ss = SpreadsheetApp.getActive();
-    
-    var settings = getColumnsData(ss.getSheetByName( 'settings' ))[0];
-    var adminEmail = settings.attorneyEmail;
-    
-    var appSettings = ss.getSheetByName("appSettings");
-    if (appSettings === null) {
-      appSettings = ss.insertSheet();
-      Utilities.sleep(500);
-      appSettings.hideSheet();
-      Utilities.sleep(500);
-      appSettings.setName("appSettings");
-      Utilities.sleep(500);
-    }
-    var AppSubFolderId = getSettings('AppSubFolderId');
-    var AppSubFolder = DriveApp.getFolderById(AppSubFolderId);
-    
-    var rStr = "unfinished";
-    
     if ( caseNo.length > 0 ) {
+      
+      var rStr = "unfinished";
+      
+      if ( caseNo === 'Case number' ) {
+        rStr = "finished";
+        return rStr;
+      }
+      
+      var ss = SpreadsheetApp.getActive();
+      
+      // check ignore list for this case
+      var ignoreSheet = ss.getSheetByName('ignore cases');
+      if (ignoreSheet !== null) {
+        var ignore = ignoreSheet.getRange(1, 1, ignoreSheet.getLastRow(), ignoreSheet.getLastColumn()).getValues();
+        if (String(ignore).indexOf(caseNo) >= 0) {
+          rStr = "finished";
+          return rStr;
+        }
+      }
+      
+      var settings = getColumnsData_(ss.getSheetByName( 'settings' ))[0];
+      
+      var appSettings = ss.getSheetByName("appSettings");
+      if (appSettings === null) {
+        appSettings = ss.insertSheet();
+        Utilities.sleep(500);
+        appSettings.hideSheet();
+        Utilities.sleep(500);
+        appSettings.setName("appSettings");
+        Utilities.sleep(500);
+      }
+      var AppSubFolderId = getSettings('AppSubFolderId');
+      var AppSubFolder = DriveApp.getFolderById(AppSubFolderId);      
       
       var getDataURL = 'https://caseinfo.aoc.arkansas.gov/cconnect/PROD/public/ck_public_qry_doct.cp_dktrpt_docket_report?backto=P&case_id=' + caseNo;
       
@@ -1218,6 +1369,12 @@ function processCase( caseNo, atty, attyEmail ) {
     msg += "\nScript: " + err.fileName;
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
+    
+	var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+	var adminEmail = settings.attorneyEmail;
+	var appUrl = SpreadsheetApp.getActive().getUrl();
+	var email_error_reports = getSettings("email_error_reports");
+	if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
   }
   
 }
@@ -1229,8 +1386,8 @@ function processAttachments( caseNo, atty, pCaseText, caseResponse ) {
   try {
     
     var ss = SpreadsheetApp.getActive();
-    var AppUrl = SpreadsheetApp.getActive().getUrl();
-    var settings = getColumnsData(ss.getSheetByName( 'settings' ))[0];
+    var appUrl = SpreadsheetApp.getActive().getUrl();
+    var settings = getColumnsData_(ss.getSheetByName( 'settings' ))[0];
     var adminEmail = settings.attorneyEmail;
     
     var attach = [];
@@ -1238,7 +1395,7 @@ function processAttachments( caseNo, atty, pCaseText, caseResponse ) {
     var pdf = '';
     var cAttCount = 0;
     
-    var d = diffString( pCaseText, caseResponse );
+    var d = diffString_( pCaseText, caseResponse );
     d = String(d).replace(/&quot;/gi, '"');
     d = String(d).replace(/%20/gi, ' ');
     d = String(d).replace(/&lt;/gi, '<');
@@ -1251,8 +1408,8 @@ function processAttachments( caseNo, atty, pCaseText, caseResponse ) {
     while (arrMatch = docPattern.exec( d )) {
       
       cAttCount++;
-      if ( cAttCount.length > 20 ) {
-        msg = caseNo + ": attachment error - excessive number of attachments detected (" + atty + ")";
+      if ( cAttCount > 25 ) {
+        msg = caseNo + ": attachment notice - excessive number of attachments detected (" + atty + ")";
         myLogger(msg);
         break;
       }
@@ -1279,21 +1436,37 @@ function processAttachments( caseNo, atty, pCaseText, caseResponse ) {
       
       var pdfLinkText = match;
       pdfLinkText = pdfLinkText.replace(/(.*?)blank\">(.*?)<\/a>/i, '$2');
-      pdfLinkText = toTitleCase(pdfLinkText);
+      pdfLinkText = toTitleCase_(pdfLinkText);
       
       var pdfName = caseNo + '-' + cAttCount + "-" + pdfLinkText + '-' + tDate + '.pdf';
       
-      var blob = UrlFetchApp.fetch(pdfURL, fetchOptions);
-      if ( blob.getResponseCode() !== 200 ) {
-        msg = "attachment response code " + blob.getResponseCode() + " for " + pdfURL + "";
+      try {
+        var blob = UrlFetchApp.fetch(pdfURL, fetchOptions);
+        
+        if ( blob.getResponseCode() !== 200 ) {
+          msg = "attachment response code " + blob.getResponseCode() + " for " + pdfURL;
+          myLogger(msg);
+        } else {
+          var pdfBlob = blob.getBlob().setContentType("application/pdf");
+          pdf = pdfBlob.getAs("application/pdf").getBytes();
+        }
+      } catch (err) {
+        msg = "attachment error\n" + "link:\n" + pdfURL + "\n(" + atty + ")\n";
+        msg += "\nMessage: " + err.message;
+        msg += "\nScript: " + err.fileName;
+        msg += "\nLine: " + err.lineNumber;
         myLogger(msg);
-        //return;
-      } else {
-        var pdfBlob = blob.getBlob().setContentType("application/pdf");
-        pdf = pdfBlob.getAs("application/pdf").getBytes();
+        
+        var email_error_reports = getSettings("email_error_reports");
+        if ( email_error_reports === true ) {
+          if ( msg.indexOf("Address unavailable") < 0 ) {
+            subject = "docket monitor attachment error";
+            MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: subject, body: msg + "\nSheet:\n" + appUrl});
+          }
+        }
       }
       
-      if ( (pdf.length <= 0) || (String(blob).toLowerCase().indexOf('pdf') < 0) ) {
+      if ( (typeof pdf === "undefined") || !pdf || (typeof pdf.length === "undefined") || (pdf.length <= 0) || (String(blob).toLowerCase().indexOf('pdf') < 0) ) {
         
         msg = caseNo + ": pdf size error (dead or unresp link) - " + pdfLinkText + " [" + pdfURL + "] (" + atty + ")";
         myLogger(msg);
@@ -1315,7 +1488,7 @@ function processAttachments( caseNo, atty, pCaseText, caseResponse ) {
           msg += "\n\nattachment text:\n" + d + "\n\n";
           subject = "docket monitor attachment push error";
           if ( msg.indexOf("Address unavailable") < 0 ) {
-            MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: subject, body: msg + "\nSheet:\n" + AppUrl});
+            MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: subject, body: msg + "\nSheet:\n" + appUrl});
           }
         }
         
@@ -1331,11 +1504,11 @@ function processAttachments( caseNo, atty, pCaseText, caseResponse ) {
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
     
-    msg += "\nLog:\n" + Logger.getLog();
-    subject = "docket monitor attachment script error";
-    if ( msg.indexOf("Address unavailable") < 0 ) {
-      MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: subject, body: msg + "\nSheet:\n" + AppUrl});
-    }
+	var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+	var adminEmail = settings.attorneyEmail;
+	var appUrl = SpreadsheetApp.getActive().getUrl();
+	var email_error_reports = getSettings("email_error_reports");
+	if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
     
   }
   
@@ -1381,11 +1554,11 @@ function followUp( case_list_remaining ) {
     var follow_up_sheet_name;
     
     try {
-      follow_up_sheet_name = case_list_rem_sheet.getSheetName();
+      follow_up_sheet_name = case_list_rem_sheet.getName();
       Utilities.sleep(500);
     } catch (err) {
       msg = "follow_up_sheet_name error\n";
-      msg = "follow_up_sheet_name = case_list_rem_sheet.getSheetName() failed";
+      msg += "follow_up_sheet_name = case_list_rem_sheet.getName() failed";
       myLogger(msg);
     }
     
@@ -1421,6 +1594,12 @@ function followUp( case_list_remaining ) {
     msg += "\nScript: " + err.fileName;
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
+    
+	var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+	var adminEmail = settings.attorneyEmail;
+	var appUrl = SpreadsheetApp.getActive().getUrl();
+	var email_error_reports = getSettings("email_error_reports");
+	if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
   }
 }
 
@@ -1433,13 +1612,13 @@ function wrapUp( script_name, script_start, caseCount, caseAddedCount, caseRemCo
     myLogger(msg);
     
     var ss = SpreadsheetApp.getActive();
-    var settings = getColumnsData(ss.getSheetByName( 'settings' ))[0];
+    var settings = getColumnsData_(ss.getSheetByName( 'settings' ))[0];
     var adminEmail = settings.attorneyEmail;
     
     var script_end = (new Date()).getTime();
     var script_dur = (((script_end - script_start) / 1000) / 60);
     
-    var AppUrl = SpreadsheetApp.getActive().getUrl();
+    var appUrl = SpreadsheetApp.getActive().getUrl();
     
     var reportDiv = "\n" + "==========================================";
     var bodyDiv = ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::";
@@ -1467,7 +1646,7 @@ function wrapUp( script_name, script_start, caseCount, caseAddedCount, caseRemCo
     if ( send_logs === true ) {
       var logText = Logger.getLog();
       msg = "\nScript log:" + "\n" + logText + bodyDiv;
-      MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: "docket monitor log", body: msg + "\nSheet:\n" + AppUrl});
+      MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: "docket monitor log", body: msg + "\nSheet:\n" + appUrl});
     }
     Logger.clear();
     
@@ -1476,6 +1655,12 @@ function wrapUp( script_name, script_start, caseCount, caseAddedCount, caseRemCo
     msg += "\nScript: " + err.fileName;
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
+    
+    var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+    var adminEmail = settings.attorneyEmail;
+    var appUrl = SpreadsheetApp.getActive().getUrl();
+    var email_error_reports = getSettings("email_error_reports");
+    if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
   }
   
 }
@@ -1513,7 +1698,7 @@ function myLogger(msg) {
 
 
 
-function toTitleCase(str) {
+function toTitleCase_(str) {
   return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
 }
 
@@ -1609,7 +1794,20 @@ function processText(text, count) {
 }
 
 
- 
+
+/////////////////////////
+
+/*
+ * Javascript Diff Algorithm
+ *  By John Resig (http://ejohn.org/)
+ *  Modified by Chu Alan "sprite"
+ *
+ * Released under the MIT license.
+ *
+ * More Info:
+ *  http://ejohn.org/projects/javascript-diff-algorithm/
+ */
+
 (function(){function diff_match_patch(){this.Diff_Timeout=1;this.Diff_EditCost=4;this.Match_Threshold=0.5;this.Match_Distance=1E3;this.Patch_DeleteThreshold=0.5;this.Patch_Margin=4;this.Match_MaxBits=32}
 diff_match_patch.prototype.diff_main=function(a,b,c,d){"undefined"==typeof d&&(d=0>=this.Diff_Timeout?Number.MAX_VALUE:(new Date).getTime()+1E3*this.Diff_Timeout);if(null==a||null==b)throw Error("Null input. (diff_main)");if(a==b)return a?[[0,a]]:[];"undefined"==typeof c&&(c=!0);var e=c,f=this.diff_commonPrefix(a,b);c=a.substring(0,f);a=a.substring(f);b=b.substring(f);var f=this.diff_commonSuffix(a,b),g=a.substring(a.length-f);a=a.substring(0,a.length-f);b=b.substring(0,b.length-f);a=this.diff_compute_(a,
 b,e,d);c&&a.unshift([0,c]);g&&a.push([0,g]);this.diff_cleanupMerge(a);return a};
@@ -1660,20 +1858,7 @@ parseInt(e[4],10));for(c++;c<a.length;){e=a[c].charAt(0);try{var g=decodeURI(a[c
 diff_match_patch.patch_obj.prototype.toString=function(){var a,b;a=0===this.length1?this.start1+",0":1==this.length1?this.start1+1:this.start1+1+","+this.length1;b=0===this.length2?this.start2+",0":1==this.length2?this.start2+1:this.start2+1+","+this.length2;a=["@@ -"+a+" +"+b+" @@\n"];var c;for(b=0;b<this.diffs.length;b++){switch(this.diffs[b][0]){case 1:c="+";break;case -1:c="-";break;case 0:c=" "}a[b+1]=c+encodeURI(this.diffs[b][1])+"\n"}return a.join("").replace(/%20/g," ")};
 this.diff_match_patch=diff_match_patch;this.DIFF_DELETE=-1;this.DIFF_INSERT=1;this.DIFF_EQUAL=0;})()
 
-/////////////////////////
-
-/*
- * Javascript Diff Algorithm
- *  By John Resig (http://ejohn.org/)
- *  Modified by Chu Alan "sprite"
- *
- * Released under the MIT license.
- *
- * More Info:
- *  http://ejohn.org/projects/javascript-diff-algorithm/
- */
-
-function escape(s) {
+function escape_(s) {
     var n = s;
     n = n.replace(/&/g, "&amp;");
     n = n.replace(/</g, "&lt;");
@@ -1683,11 +1868,11 @@ function escape(s) {
     return n;
 }
 
-function diffString( o, n ) {
+function diffString_( o, n ) {
   o = o.replace(/\s+$/, '');
   n = n.replace(/\s+$/, '');
 
-  var out = diff(o == "" ? [] : o.split(/\s+/), n == "" ? [] : n.split(/\s+/) );
+  var out = diff_(o == "" ? [] : o.split(/\s+/), n == "" ? [] : n.split(/\s+/) );
   var str = "";
 
   var oSpace = o.match(/\s+/g);
@@ -1705,23 +1890,23 @@ function diffString( o, n ) {
 
   if (out.n.length == 0) {
       for (var i = 0; i < out.o.length; i++) {
-        str += '<del>' + escape(out.o[i]) + oSpace[i] + "</del>";
+        str += '<del>' + escape_(out.o[i]) + oSpace[i] + "</del>";
       }
   } else {
     if (out.n[0].text == null) {
       for (n = 0; n < out.o.length && out.o[n].text == null; n++) {
-        str += '<del>' + escape(out.o[n]) + oSpace[n] + "</del>";
+        str += '<del>' + escape_(out.o[n]) + oSpace[n] + "</del>";
       }
     }
 
     for ( var i = 0; i < out.n.length; i++ ) {
       if (out.n[i].text == null) {
-        str += '<ins>' + escape(out.n[i]) + nSpace[i] + "</ins>";
+        str += '<ins>' + escape_(out.n[i]) + nSpace[i] + "</ins>";
       } else {
         var pre = "";
 
         for (n = out.n[i].row + 1; n < out.o.length && out.o[n].text == null; n++ ) {
-          pre += '<del>' + escape(out.o[n]) + oSpace[n] + "</del>";
+          pre += '<del>' + escape_(out.o[n]) + oSpace[n] + "</del>";
         }
         str += " " + out.n[i].text + nSpace[i] + pre;
       }
@@ -1731,7 +1916,7 @@ function diffString( o, n ) {
   return str;
 }
 
-function diff( o, n ) {
+function diff_( o, n ) {
   var ns = new Object();
   var os = new Object();
   
@@ -1786,10 +1971,10 @@ function diff( o, n ) {
 //     defaults to the entire first row in sheet.
 //   - optFirstDataRowIndex: index of the first row where data should be written. This
 //     defaults to the row immediately below the headers.
-function setRowsData(sheet, objects, optHeadersRange, optFirstDataRowIndex) {
+function setRowsData_(sheet, objects, optHeadersRange, optFirstDataRowIndex) {
   var headersRange = optHeadersRange || sheet.getRange(1, 1, 1, sheet.getMaxColumns());
   var firstDataRowIndex = optFirstDataRowIndex || headersRange.getRowIndex() + 1;
-  var headers = normalizeHeaders(headersRange.getValues()[0]);
+  var headers = normalizeHeaders_(headersRange.getValues()[0]);
  
   var data = [];
   for (var i = 0; i < objects.length; ++i) {
@@ -1816,22 +2001,22 @@ function setRowsData(sheet, objects, optHeadersRange, optFirstDataRowIndex) {
 //   - columnHeadersRowIndex: specifies the row number where the column names are stored.
 //       This argument is optional and it defaults to the row immediately above range; 
 // Returns an Array of objects.
-function getRowsData(sheet, range, columnHeadersRowIndex) {
+function getRowsData_(sheet, range, columnHeadersRowIndex) {
   var headersIndex = columnHeadersRowIndex || 1;
   var dataRange = range || 
     sheet.getRange(headersIndex + 1, 1, sheet.getMaxRows() - headersIndex, sheet.getMaxColumns());
   var numColumns = dataRange.getEndColumn() - dataRange.getColumn() + 1;
   var headersRange = sheet.getRange(headersIndex, dataRange.getColumn(), 1, numColumns);
   var headers = headersRange.getValues()[0];
-  return getObjects(dataRange.getValues(), normalizeHeaders(headers));
+  return getObjects_(dataRange.getValues(), normalizeHeaders_(headers));
 }
 
 // Given a JavaScript 2d Array, this function returns the transposed table.
 // Arguments:
 //   - data: JavaScript 2d Array
 // Returns a JavaScript 2d Array
-// Example: arrayTranspose([[1,2,3],[4,5,6]]) returns [[1,4],[2,5],[3,6]].
-function arrayTranspose(data) {
+// Example: arrayTranspose_([[1,2,3],[4,5,6]]) returns [[1,4],[2,5],[3,6]].
+function arrayTranspose_(data) {
   if (data.length == 0 || data[0].length == 0) {
     return null;
   }
@@ -1861,14 +2046,14 @@ function arrayTranspose(data) {
 //   - columnHeadersIndex: specifies the row number where the column names are stored.
 //       This argument is optional and it defaults to the row immediately above range; 
 // Returns an Array of objects.
-function getColumnsData(sheet, range, columnHeadersIndex) {
+function getColumnsData_(sheet, range, columnHeadersIndex) {
   var headersIndex = columnHeadersIndex || range ? range.getColumnIndex() - 1 : 1;
   var dataRange = range || 
     sheet.getRange(1, headersIndex + 1, sheet.getMaxRows(), sheet.getMaxColumns()- headersIndex);
   var numRows = dataRange.getLastRow() - dataRange.getRow() + 1;
   var headersRange = sheet.getRange(dataRange.getRow(),headersIndex,numRows,1);
-  var headers = arrayTranspose(headersRange.getValues())[0];
-  return getObjects(arrayTranspose(dataRange.getValues()), normalizeHeaders(headers));
+  var headers = arrayTranspose_(headersRange.getValues())[0];
+  return getObjects_(arrayTranspose_(dataRange.getValues()), normalizeHeaders_(headers));
 }
  
 // For every row of data in data, generates an object that contains the data. Names of
@@ -1876,14 +2061,14 @@ function getColumnsData(sheet, range, columnHeadersIndex) {
 // Arguments:
 //   - data: JavaScript 2d array
 //   - keys: Array of Strings that define the property names for the objects to create
-function getObjects(data, keys) {
+function getObjects_(data, keys) {
   var objects = [];
   for (var i = 0; i < data.length; ++i) {
     var object = {};
     var hasData = false;
     for (var j = 0; j < data[i].length; ++j) {
       var cellData = data[i][j];
-      if (isCellEmpty(cellData)) {
+      if (isCellEmpty_(cellData)) {
         continue;
       }
       object[keys[j]] = cellData;
@@ -1900,10 +2085,10 @@ function getObjects(data, keys) {
 // Empty Strings are returned for all Strings that could not be successfully normalized.
 // Arguments:
 //   - headers: Array of Strings to normalize
-function normalizeHeaders(headers) {
+function normalizeHeaders_(headers) {
   var keys = [];
   for (var i = 0; i < headers.length; ++i) {
-    keys.push(normalizeHeader(headers[i]));
+    keys.push(normalizeHeader_(headers[i]));
   }
   return keys;
 }
@@ -1917,7 +2102,7 @@ function normalizeHeaders(headers) {
 //   "First Name" -> "firstName"
 //   "Market Cap (millions) -> "marketCapMillions
 //   "1 number at the beginning is ignored" -> "numberAtTheBeginningIsIgnored"
-function normalizeHeader(header) {
+function normalizeHeader_(header) {
   var key = "";
   var upperCase = false;
   for (var i = 0; i < header.length; ++i) {
@@ -1926,10 +2111,10 @@ function normalizeHeader(header) {
       upperCase = true;
       continue;
     }
-    //if (!isAlnum(letter)) { // I removed this because result identifiers have '_' in name
+    //if (!isAlnum_(letter)) { // I removed this because result identifiers have '_' in name
     //  continue;
     //}
-    if (key.length == 0 && isDigit(letter)) {
+    if (key.length == 0 && isDigit_(letter)) {
       continue; // first character must be a letter
     }
     if (upperCase) {
@@ -1945,22 +2130,22 @@ function normalizeHeader(header) {
 // Returns true if the cell where cellData was read from is empty.
 // Arguments:
 //   - cellData: string
-function isCellEmpty(cellData) {
+function isCellEmpty_(cellData) {
   return typeof(cellData) == "string" && cellData == "";
 }
  
 // Returns true if the character char is alphabetical, false otherwise.
-function isAlnum(char) {
+function isAlnum_(char) {
   return char >= 'A' && char <= 'Z' ||
     char >= 'a' && char <= 'z' ||
-    isDigit(char);
+    isDigit_(char);
 }
  
 // Returns true if the character char is a digit, false otherwise.
-function isDigit(char) {
+function isDigit_(char) {
   return char >= '0' && char <= '9';
 }
  
-function alltrim(str) {
+function alltrim_(str) {
   if (str != null) return str.replace(/^\s+|\s+$/g, '');
 }
