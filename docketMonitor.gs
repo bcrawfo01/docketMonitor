@@ -172,11 +172,11 @@ function createOtherCasesSheet() {
   try {
     
     var ss = SpreadsheetApp.getActive();
-    var sheet = ss.getSheetByName( 'other cases' );
+    var sheet = ss.getSheetByName( 'additional cases' );
     if (sheet === null) {
       sheet = ss.insertSheet();
       Utilities.sleep(500);
-      sheet.setName( 'other cases' );
+      sheet.setName( 'additional cases' );
       Utilities.sleep(500);
     } else { 
       sheet.clear();
@@ -465,7 +465,7 @@ function removeInvalidSheets() {
       sheetName = sheet.getName();
       
       if (sheetName === "log") { continue; }
-      if (sheetName === "other cases") { continue; }
+      if (sheetName === "additional cases") { continue; }
       if (sheetName === "ignore cases") { continue; }
       if (sheet.isSheetHidden()) { continue; }
       if ( sheetName.indexOf("etting") >= 0 ) { continue; }
