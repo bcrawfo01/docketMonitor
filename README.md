@@ -15,6 +15,14 @@ The script depends on Google's servers and CourtConnect’s servers so if either
 Apps Script has [quotas](https://developers.google.com/apps-script/guides/services/quotas). Attorneys with a substantial number of cases might hit quota limitations. You might also hit quota limitations if you use a free Google account. 
 
 
+## Changelog & Updates
+[v2.0](https://github.com/bcrawfo01/docketMonitor/tree/2c15cecd10025a90415be3c4f362077acff5033f/docketMonitor.gs)<br>
+&nbsp; &bull; Added ability to stop unwanted email updates for certain cases<br>
+&nbsp; &bull; Added ability to specify additional cases to monitor<br>
+
+[v1.0](https://github.com/bcrawfo01/docketMonitor/blob/1a43ff79b9cf75b26a8d8cc7b8abc9c5ebc57e2e/docketMonitor.gs)<br>
+&nbsp; &bull; Initial release
+
 
 ## Installation
 <p><i>Method 1 (easier method):</i></p>
