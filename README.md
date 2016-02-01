@@ -16,7 +16,7 @@ Apps Script has [quotas](https://developers.google.com/apps-script/guides/servic
 
 
 ## Changelog & Updates
-[v2.0](https://github.com/bcrawfo01/docketMonitor/tree/2c15cecd10025a90415be3c4f362077acff5033f/docketMonitor.gs)<br>
+[v2.0](https://github.com/bcrawfo01/docketMonitor/tree/b73b72b71555fd56000fb9ea0b4804915589875c/docketMonitor.gs)<br>
 &nbsp; &bull; Added ability to stop unwanted email updates for certain cases<br>
 &nbsp; &bull; Added ability to specify additional cases to monitor<br>
 
