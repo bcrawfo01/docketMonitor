@@ -840,7 +840,7 @@ function dmPrimary() {
           continue;
         }
         
-        if ( (sheet.getName().indexOf("AR") < 0) && (sheet.getName().indexOf("ther cases") < 0) ) { continue; }
+        if ( (sheet.getName().indexOf("AR") < 0) && (sheet.getName().indexOf("nal cases") < 0) ) { continue; }
         
         // iterate through every row/case on the sheet and add it to the case_list array
         if (sheet.getLastRow() === 0) continue;
