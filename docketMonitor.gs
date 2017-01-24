@@ -384,15 +384,18 @@ function getSettings(property) {
   
   appSettingsValues = appSettings.getDataRange().getValues();
   
-  var prop, value;
-  for (var p = 0; p < appSettingsValues.length; p++) {
-    prop = appSettingsValues[p][0];
-    value = appSettingsValues[p][1];
-    if ( ( property.indexOf('App') >= 0 ) || ( property.indexOf('fol') >= 0 ) ) {
-      if ( prop.indexOf(property) >= 0 ) { return value; }
-    } else {
-      if ( prop === property ) { return value; }
+  if (String(appSettingsValues).indexOf(property) >= 0) {
+    var prop, value;
+    for (var p = 0; p < appSettingsValues.length; p++) {
+      prop = appSettingsValues[p][0];
+      value = appSettingsValues[p][1];
+      if ( ( property.indexOf('App') >= 0 ) || ( property.indexOf('fol') >= 0 ) ) {
+        if ( prop.indexOf(property) >= 0 ) { return value; }
+      } else {
+        if ( prop === property ) { return value; }
+      }
     }
+    return false;
   }
   return false;
 }
@@ -531,7 +534,7 @@ var sheet, sheetName, numRows, numCols, dataRange, values, r, k;
 
 var trigger_delay_mins = 5;
 
-var max_running_time_mins = 5.1;
+var max_running_time_mins = 4.9;
 var max_running_time = 1000 * 60 * max_running_time_mins;
 var timeLimitIsNear, currTime;
 
@@ -999,7 +1002,7 @@ function processAtty( barNo, atty, attyEmail ) {
     
     
     // fetch the URL for atty's CourtConnect page
-    var getDataURL = 'https://caseinfo.aoc.arkansas.gov/cconnect/PROD/public/ck_public_qry_cpty.cp_personcase_srch_details?backto=P&id_code=' + barNo;
+    var getDataURL = 'https://caseinfo.aoc.arkansas.gov/cconnect/PROD/public/ck_public_qry_cpty.cp_personcase_srch_details?id_code=' + barNo;
     getDataURL = encodeURI(getDataURL);
     var getDataURLbase = getDataURL;
     var fetch, response;
@@ -1213,7 +1216,7 @@ function processCase( caseNo, atty, attyEmail ) {
       var AppSubFolderId = getSettings('AppSubFolderId');
       var AppSubFolder = DriveApp.getFolderById(AppSubFolderId);      
       
-      var getDataURL = 'https://caseinfo.aoc.arkansas.gov/cconnect/PROD/public/ck_public_qry_doct.cp_dktrpt_docket_report?backto=P&case_id=' + caseNo;
+      var getDataURL = 'https://caseinfo.aoc.arkansas.gov/cconnect/PROD/public/ck_public_qry_doct.cp_dktrpt_docket_report?case_id=' + caseNo;
       
       var response = UrlFetchApp.fetch(getDataURL, fetchOptions);
       var siteStatus = response.getResponseCode();
@@ -1314,7 +1317,20 @@ function processCase( caseNo, atty, attyEmail ) {
       
       // compare the existing case docket document to the http response
       // if the response is different, replace the existing case docket document, and generate an update email
-      if (caseResponse !== pCaseText) {
+      var caseResponseCheck = caseResponse.replace(/<(?:.|\n)*?>/gm, '');
+      var pCaseTextCheck = pCaseText.replace(/<(?:.|\n)*?>/gm, '');
+      
+      if ( (caseResponse !== pCaseText) && (caseResponseCheck === pCaseTextCheck) ) {
+        // save the new content to the docket file
+        caseFile = DriveApp.getFileById(caseFileId);
+        caseFile.setContent(caseResponse);  
+        msg = caseNo + ": docket file updated (" + atty + ") [no update sent] ";
+        myLogger(msg);
+        rStr = "finished";
+        return rStr;
+      }
+      
+      if (caseResponseCheck !== pCaseTextCheck) {
         
         caseUpdateCount++;
         
@@ -1341,7 +1357,7 @@ function processCase( caseNo, atty, attyEmail ) {
         ds = ds.replace(/&para;/g, '');
         
         subject = caseNo + ' Docket Monitor Update';
-        body = ds + "<br /><hr>(" + caseNo + " docket: " + getDataURL + ")" + "<br />Attorney: " + atty;
+        body = ds + "<br /><hr>" + caseNo + " docket: " + getDataURL + "" + "<br />DocketMonitor: " + SpreadsheetApp.getActive().getUrl();
         
         if ( attach.length > 0 ) {
           if ( send_updates === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: attyEmail, subject: subject, htmlBody: body, attachments:attach}); }
@@ -1427,6 +1443,8 @@ function processAttachments( caseNo, atty, pCaseText, caseResponse ) {
           pdfURL = pdfURL.split('"')[0];
         }
       }
+      
+      pdfURL = pdfURL.replace(/&amp;/g, '&');
       
       if ( pdfURL.indexOf('192.168') >= 0 ) {
         msg = caseNo + ": attachment error (" + atty + ")\nlocal ip listed for server";
@@ -1718,7 +1736,7 @@ function processHTML(html, count) {
 function processText(text, count) {
   
   //entities
-  text = text.replace(/(&?nbsp;?|&?amp;?)/gi, '\n');
+  text = text.replace(/(&?nbsp;?)/gi, '\n');
   text = text.replace(/(&lt;\/TABLE&gt; *)/gi, '\n');
   text = text.replace(/(<\/TABLE> ?)/gi, '\n');
   
@@ -1767,7 +1785,6 @@ function processText(text, count) {
   
   text = text.replace(/(Case ID:|Filing Date:|Court:|Location:|Type:|Status:)( *\n)/gi, "$1 ");
   text = text.replace(/(Violation Date:|Violation Time:)( *\n)/gi, "$1 \n");
-  text = text.replace(/(Sentence)(:)*(\n| )*(No Sentence Info)( found)?(\.)?(\n)?/gi, "Sentence:");
   text = text.replace(/(Milestone Tracks)(:)*(\n| )*(No Milestone Tracks)( found)?(\.)?/gi, "");
   text = text.replace(/(Violation: *)\n(\d) *\n/gi, "$1 $2\n");
   text = text.replace(/(No docket entries found\.)/gi, "No docket entries found.");
@@ -1776,7 +1793,7 @@ function processText(text, count) {
   text = text.replace(/(\n)(\n{2,})/gi, "\n\n");
   //text = text.replace(/(Case Event Schedule)([\s\n]+)(\w)/gi, "$1\n$3");
   text = text.replace(/(Case Description|Case Event Schedule|Case Parties|Violations|Docket Entries)/gi, "\n\n*** $1 ***");
-  //text = text.replace(/(Sentence)(\nName)/gi, "\n\n*** $1 ***$2");  
+  text = text.replace(/(\n)(Sentence)(\n)/, "\n\n\n*** SENTENCE ***\n");
   text = text.replace("*** Case Description ***", "*** CASE DESCRIPTION ***");
   text = text.replace("*** Case Event Schedule ***", "*** CASE EVENT SCHEDULE ***");
   text = text.replace("*** Case Parties ***", "*** CASE PARTIES ***");
