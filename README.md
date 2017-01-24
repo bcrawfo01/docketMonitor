@@ -16,6 +16,13 @@ Apps Script has [quotas](https://developers.google.com/apps-script/guides/servic
 
 
 ## Changelog & Updates
+[v3.0](https://github.com/bcrawfo01/docketMonitor/tree/91dc74d95e1aaab8913cd18548b4c15e085027fe/docketMonitor.gs)<br>
+&nbsp; &bull; Modified the text used for comparison to avoid false updates<br>
+&nbsp; &bull; Reduced max run time to prevent "Exceeded maximum execution time" error<br>
+&nbsp; &bull; Updated some formatting for update emails<br>
+&nbsp; &bull; Added link to Docket Monitor Google Sheet to update emails<br>
+&nbsp; &bull; Modified getSettings function<br>
+
 [v2.0](https://github.com/bcrawfo01/docketMonitor/tree/b73b72b71555fd56000fb9ea0b4804915589875c/docketMonitor.gs)<br>
 &nbsp; &bull; Added ability to stop unwanted email updates for certain cases<br>
 &nbsp; &bull; Added ability to specify additional cases to monitor<br>
@@ -49,6 +56,13 @@ That’s it. You can close the sheet. Everything else is automated.
 
 
 Optional: [Sign up](http://github-file-watcher.com/?repository=bcrawfo01/docketMonitor&glob=*) to receive email alerts when this repo is updated.
+
+
+## Updating
+1. Open the Docket Monitor Google Sheet, and open the script editor (Tools > Script editor).
+2. Delete the existing code.
+3. Copy the code from docketMonitor.gs and paste it into the script editor.
+4. Save the file.
 
 
 ## Removing the script
