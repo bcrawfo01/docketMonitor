@@ -61,7 +61,7 @@ Optional: [Sign up](http://github-file-watcher.com/?repository=bcrawfo01/docketM
 ## Updating
 1. Open the Docket Monitor Google Sheet, and open the script editor (Tools > Script editor).
 2. Delete the existing code.
-3. Copy the code from docketMonitor.gs and paste it into the script editor.
+3. Copy the code from [docketMonitor.gs](https://raw.githubusercontent.com/bcrawfo01/docketMonitor/master/docketMonitor.gs) and paste it into the script editor.
 4. Save the file.
 
 
