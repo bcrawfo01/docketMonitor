@@ -32,14 +32,14 @@ Apps Script has [quotas](https://developers.google.com/apps-script/guides/servic
 
 
 ## Installation
-<p><i>Method 1 (easier method):</i></p>
+_Method 1 (easier method):_
 1. Open [this Google sheet](https://docs.google.com/spreadsheets/d/1_20QFJNNWEYpGvjbX8UjWZnuAYRCp-QE3Xc20rJJjVk/edit?usp=sharing), and make a copy (File > Make a copy...).
 2. Refresh the new Google Sheet. Once you refresh the sheet, the script will add a custom menu named "Docket Monitor" to the menu bar.
 3. Run setup (Docket Monitor > setup) and grant the script authorization.
 4. Review the help file (Docket Monitor > help) and add your information to the settings sheet.
 5. Update your case list (Docket Monitor > update case list).
 
-<p><i>Method 2:</i></p>
+_Method 2:_
 1. Create a [new Google Sheet](http://spreadsheets.google.com/ccc?new), and open the script editor (Tools > Script editor). If you see a new script dialog, select the Blank Project option.
 2. Delete the default code. Copy the code from [docketMonitor.gs](https://raw.githubusercontent.com/bcrawfo01/docketMonitor/master/docketMonitor.gs) and paste it into the script editor. Save the file. Use any name you wish when prompted to name the script.
 3. Select Run > setup and grant the script authorization.
@@ -70,6 +70,7 @@ The script creates a folder named "Docket Monitor" to store files without clutte
 
 
 ***
-<strong>Released under Creative Commons</strong>
+**Released under Creative Commons**
 
-<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Docket Monitor</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="https://www.dynamicpractices.com/" property="cc:attributionName" rel="cc:attributionURL">Brandon Crawford</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+[![Creative Commons License](https://i.creativecommons.org/l/by-sa/4.0/88x31.png)](http://creativecommons.org/licenses/by-sa/4.0/)  
+<span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Docket Monitor</span> by [Brandon Crawford](https://www.dynamicpractices.com/) is licensed under a [Creative Commons Attribution-ShareAlike 4.0 International License](http://creativecommons.org/licenses/by-sa/4.0/).
