@@ -16,6 +16,13 @@ Apps Script has [quotas](https://developers.google.com/apps-script/guides/servic
 
 
 ## Changelog & Updates
+[v4.0](https://github.com/bcrawfo01/docketMonitor/tree/8e8423975b406916d69aa18e3c4c42ea50fb511a/docketMonitor.gs)<br>
+&nbsp; &bull; Added option to ignore case parties to avoid erroneous updates<br>
+&nbsp; &bull; Added attachment logging to avoid duplicate attachments in update emails<br>
+&nbsp; &bull; Modified string manipulation functions<br>
+&nbsp; &bull; Added addSettings function<br>
+&nbsp; &bull; Revised some documentation<br>
+
 [v3.0](https://github.com/bcrawfo01/docketMonitor/tree/91dc74d95e1aaab8913cd18548b4c15e085027fe/docketMonitor.gs)<br>
 &nbsp; &bull; Modified the text used for comparison to avoid false updates<br>
 &nbsp; &bull; Reduced max run time to prevent "Exceeded maximum execution time" error<br>
