@@ -397,7 +397,10 @@ function getSettings(property) {
         if ( prop === property ) { return value; }
       }
     }
+    //return false;
+    return 'property not found';
   }
+  //return false;
   return 'property not found';
 }
 
@@ -413,7 +416,11 @@ function addSettings(property,value) {
     appSettings.setName("appSettings");
     Utilities.sleep(500);
   }
-  appSettings.appendRow([property,value]);
+  //appSettings.appendRow([property,value]);
+  appSettings.insertRowBefore(1);
+  Utilities.sleep(500);
+  appSettings.getRange(1,1,1,2).setValues([[property,value]]);
+  Utilities.sleep(500);
   
   var cache = CacheService.getUserCache();
   var appSettingsValues, appSettingsValuesString;
@@ -427,7 +434,6 @@ function addSettings(property,value) {
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
   }
-  
   return;
 }
 
@@ -557,6 +563,29 @@ function resetDM() {
   var numCols = appSettingsValues[0].length;
   var newRange = appSettings.getRange(1, 1, numRows, numCols);
   newRange.setValues(appSettingsValues);
+  
+}
+
+
+function uhOh() {
+  
+  var link = '';
+  var ss = SpreadsheetApp.getActive();
+  var file = DriveApp.getFileById(ss.getId());
+  var parentFolders = file.getParents();
+  while (parentFolders.hasNext()) {
+    var parentFolder = parentFolders.next();
+    link = '<a href="' + parentFolder.getUrl() + '">follow this link</a>, ';
+  }
+  var content = '<link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons.css"><p style="font-weight: bold;">Uh-oh. Something went wrong.</p><p>';
+  content += '1. Try resetting the script (Docket Monitor > reset).<br>';
+  content += '2. Make sure you have the <a href="https://github.com/bcrawfo01/docketMonitor/blob/master/docketMonitor.gs">most recent version of the script</a>.<br>';
+  content += '3. If the errors persist, ' + link + 'delete the Docket Monitor folder, and <a href="https://github.com/bcrawfo01/docketMonitor/#installation">start over</a>.';
+  content += '</p><hr><p><input class="blue" type="button" value="Close" onclick="google.script.host.close()" /></p>';
+  var html = HtmlService.createHtmlOutput(String(content))
+  .setWidth(400)
+  .setHeight(200);
+  ss.show(html);
   
 }
 
@@ -748,7 +777,7 @@ function dmPrimary() {
     
     //determine if follow up is necessary
     follow_up_prop = getSettings('follow_up_cases');
-    if ( follow_up_prop ) {
+    if ( follow_up_prop !== 'property not found' ) {
       
       //follow up cases remaining from last run
       
@@ -836,6 +865,11 @@ function dmPrimary() {
           rCheck = "finished";
         } else {
           rCheck = processCase( caseNo, atty, attyEmail );
+        }
+        
+        if ( rCheck === "fatalError" ) {
+          uhOh();
+          return;
         }
         
         // remove the case from the case_list_remaining array
@@ -1247,6 +1281,9 @@ function processCase( caseNo, atty, attyEmail ) {
         Utilities.sleep(500);
       }
       var AppSubFolderId = getSettings('AppSubFolderId');
+      if ( AppSubFolderId === 'property not found' ) {
+        return 'fatalError';
+      }
       var AppSubFolder = DriveApp.getFolderById(AppSubFolderId);      
       
       var getDataURL = 'https://caseinfo.aoc.arkansas.gov/cconnect/PROD/public/ck_public_qry_doct.cp_dktrpt_docket_report?case_id=' + caseNo;
@@ -1299,7 +1336,7 @@ function processCase( caseNo, atty, attyEmail ) {
       var caseFileId;
       caseFileId = getSettings(caseNo);
       
-      if ( caseFileId ) {
+      if ( caseFileId !== 'property not found' ) {
         try {
           caseFile = DriveApp.getFileById(caseFileId);
           if (caseFile.isTrashed()) { caseFile = ''; }
@@ -1317,7 +1354,7 @@ function processCase( caseNo, atty, attyEmail ) {
       
       // if a case docket document does not exist, create it, and skip to next iteration
       var nCaseText;
-      if ( !caseFileId || !caseFile ) {
+      if ( caseFileId === 'property not found' || !caseFile ) {
         caseAddedCount++;
         var date = Utilities.formatDate(new Date(), "America/Chicago", "MM/dd/yyyy");
         caseFile = AppSubFolder.createFile(caseNo, caseResponse, MimeType.PLAIN_TEXT);
@@ -1502,7 +1539,7 @@ function processAttachments( caseNo, atty, pCaseText, caseResponse ) {
           //determine if file has already been sent in a previous update
           var md5Check = String(Utilities.computeDigest(Utilities.DigestAlgorithm.MD5, blob));
           var prevAttachment = getSettings(md5Check);
-          if (!prevAttachment) {
+          if ( prevAttachment === 'property not found' ) {
             //file has not been sent in an update
             var pdfBlob = blob.getBlob().setContentType("application/pdf");
             pdf = pdfBlob.getAs("application/pdf").getBytes();
@@ -1765,19 +1802,18 @@ function processRawResponse(html) {
   
   html = html.toString();
   
-  // remove html tags but not white space
-  html = html.replace(/<(?:.|\n)*?>/gm, '');
-  
   // if enabled, remove case parties to prevent erroneous updates
   var ignore_parties = getSettings("ignore_parties");
   if ( ignore_parties === 'property not found' ) {
     addSettings("ignore_parties","TRUE");
-    ignore_parties = getSettings("ignore_parties");
+    ignore_parties = true;
   }
   if ( ignore_parties === true ) {
     html = html.replace(/\<A NAME\="parties"\>([\s\S]*?)\<A NAME\="violations"\>/gim, '<A NAME="violations">');
   }
   
+  // remove html tags but not white space
+  html = html.replace(/<(?:.|\n)*?>/gm, '');
   
   return html;
   
