@@ -16,6 +16,9 @@ Apps Script has [quotas](https://developers.google.com/apps-script/guides/servic
 
 
 ## Changelog & Updates
+[v6.0](https://github.com/bcrawfo01/docketMonitor/blob/0c98a16f39dc32052ac6423ae6d012a9c633ab6e/docketMonitor.gs)<br>
+&nbsp; &bull; Updated CourtConnect url<br>
+
 [v5.0](https://github.com/bcrawfo01/docketMonitor/tree/00f6407daf9b3e74f93126c273e4573a6e27b433/docketMonitor.gs)<br>
 &nbsp; &bull; Modified string manipulation functions<br>
 &nbsp; &bull; Modified addSettings function<br>
