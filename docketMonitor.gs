@@ -1071,7 +1071,7 @@ function processAtty( barNo, atty, attyEmail ) {
     
     
     // fetch the URL for atty's CourtConnect page
-    var getDataURL = 'https://caseinfo.aoc.arkansas.gov/cconnect/PROD/public/ck_public_qry_cpty.cp_personcase_srch_details?id_code=' + barNo;
+    var getDataURL = 'https://caseinfo.arcourts.gov/cconnect/PROD/public/ck_public_qry_cpty.cp_personcase_srch_details?id_code=' + barNo;
     getDataURL = encodeURI(getDataURL);
     var getDataURLbase = getDataURL;
     var fetch, response;
@@ -1286,7 +1286,7 @@ function processCase( caseNo, atty, attyEmail ) {
       }
       var AppSubFolder = DriveApp.getFolderById(AppSubFolderId);      
       
-      var getDataURL = 'https://caseinfo.aoc.arkansas.gov/cconnect/PROD/public/ck_public_qry_doct.cp_dktrpt_docket_report?case_id=' + caseNo;
+      var getDataURL = 'https://caseinfo.arcourts.gov/cconnect/PROD/public/ck_public_qry_doct.cp_dktrpt_docket_report?case_id=' + caseNo;
       
       var response = UrlFetchApp.fetch(getDataURL, fetchOptions);
       var siteStatus = response.getResponseCode();
