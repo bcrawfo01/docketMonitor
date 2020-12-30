@@ -1043,10 +1043,12 @@ function dmPrimary() {
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
     
-    var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
-    var adminEmail = settings.attorneyEmail;
-    var email_error_reports = getSettings("email_error_reports");
-    if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
+    if ( !msg.match( /(server error|service error|timeout|unavailable|address unavailable)/gi ) ) {
+      var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+      var adminEmail = settings.attorneyEmail;
+      var email_error_reports = getSettings("email_error_reports");
+      if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
+    }
   }
   
 }
@@ -1235,10 +1237,12 @@ function processAtty( barNo, atty, attyEmail ) {
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
     
-    var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
-    var adminEmail = settings.attorneyEmail;
-    var email_error_reports = getSettings("email_error_reports");
-    if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
+    if ( !msg.match( /(server error|service error|timeout|unavailable|address unavailable)/gi ) ) {
+      var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+      var adminEmail = settings.attorneyEmail;
+      var email_error_reports = getSettings("email_error_reports");
+      if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
+    }
   }
 }
 
@@ -1295,6 +1299,13 @@ function processCase( caseNo, atty, attyEmail ) {
       // determine if http response is valid    
       if ( siteStatus !== 200 ) {
         msg = caseNo + ": error - server response was " + siteStatus + " [" + getDataURL + "] (" + atty + ")";
+        myLogger(msg);
+        return rStr;
+      }
+      
+      // determine if response contains case data
+      if ( typeof caseResponse === "undefined" || typeof caseResponse.length === "undefined" ||  caseResponse.length < 5 ) {
+        msg = caseNo + ": error - server returned a valid but blank response [" + getDataURL + "] (" + atty + ")";
         myLogger(msg);
         return rStr;
       }
@@ -1385,6 +1396,19 @@ function processCase( caseNo, atty, attyEmail ) {
       var txtBlob = blob.getBlob();
       pCaseText = txtBlob.getDataAsString();
       
+      
+      // confirm that a blank response wasn't previously stored to case docket document
+      // if so, replace the existing case docket document without generating an update email
+      if ( typeof pCaseText === "undefined" || typeof pCaseText.length === "undefined" ||  pCaseText.length < 5 ) {
+        caseFile = DriveApp.getFileById(caseFileId);
+        caseFile.setContent(caseResponse);  
+        msg = caseNo + ": docket file updated (" + atty + ")";
+        myLogger(msg);
+        rStr = "finished";
+        return rStr;
+      }
+      
+      
       // compare the existing case docket document to the http response
       // if the response is different, replace the existing case docket document, and generate an update email
       /////////////////////////////
@@ -1458,10 +1482,12 @@ function processCase( caseNo, atty, attyEmail ) {
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
     
-    var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
-    var adminEmail = settings.attorneyEmail;
-    var email_error_reports = getSettings("email_error_reports");
-    if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
+    if ( !msg.match( /(server error|service error|timeout|unavailable|address unavailable)/gi ) ) {
+      var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+      var adminEmail = settings.attorneyEmail;
+      var email_error_reports = getSettings("email_error_reports");
+      if ( email_error_reports === true ) MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl});
+    }
   }
   
 }
@@ -1559,12 +1585,11 @@ function processAttachments( caseNo, atty, pCaseText, caseResponse ) {
         msg += "\nLine: " + err.lineNumber;
         myLogger(msg);
         
-        var email_error_reports = getSettings("email_error_reports");
-        if ( email_error_reports === true ) {
-          if ( msg.indexOf("Address unavailable") < 0 ) {
-            subject = "docket monitor attachment error";
-            MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: subject, body: msg + "\nSheet:\n" + appUrl});
-          }
+        if ( !msg.match( /(server error|service error|timeout|unavailable|address unavailable)/gi ) ) {
+          var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+          var adminEmail = settings.attorneyEmail;
+          var email_error_reports = getSettings("email_error_reports");
+          if ( email_error_reports === true ) MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor attachment error report', body: msg + "\nSheet:\n" + appUrl});
         }
       }
       
@@ -1606,10 +1631,12 @@ function processAttachments( caseNo, atty, pCaseText, caseResponse ) {
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
     
-    var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
-    var adminEmail = settings.attorneyEmail;
-    var email_error_reports = getSettings("email_error_reports");
-    if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
+    if ( !msg.match( /(server error|service error|timeout|unavailable|address unavailable)/gi ) ) {
+      var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+      var adminEmail = settings.attorneyEmail;
+      var email_error_reports = getSettings("email_error_reports");
+      if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
+    }
     
   }
   
@@ -1695,10 +1722,12 @@ function followUp( case_list_remaining ) {
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
     
-    var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
-    var adminEmail = settings.attorneyEmail;
-    var email_error_reports = getSettings("email_error_reports");
-    if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
+    if ( !msg.match( /(server error|service error|timeout|unavailable|address unavailable)/gi ) ) {
+      var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+      var adminEmail = settings.attorneyEmail;
+      var email_error_reports = getSettings("email_error_reports");
+      if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
+    }
   }
 }
 
@@ -1752,10 +1781,12 @@ function wrapUp( script_name, script_start, caseCount, caseAddedCount, caseRemCo
     msg += "\nLine: " + err.lineNumber;
     myLogger(msg);
     
-    var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
-    var adminEmail = settings.attorneyEmail;
-    var email_error_reports = getSettings("email_error_reports");
-    if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
+    if ( !msg.match( /(server error|service error|timeout|unavailable|address unavailable)/gi ) ) {
+      var settings = getColumnsData_(SpreadsheetApp.getActive().getSheetByName( 'settings' ))[0];
+      var adminEmail = settings.attorneyEmail;
+      var email_error_reports = getSettings("email_error_reports");
+      if ( email_error_reports === true ) { MailApp.sendEmail({name: 'Docket Monitor', to: adminEmail, subject: 'docketMonitor error report', body: msg + "\nSheet:\n" + appUrl}); }
+    }
   }
   
 }
@@ -1809,8 +1840,11 @@ function processRawResponse(html) {
     ignore_parties = true;
   }
   if ( ignore_parties === true ) {
-    html = html.replace(/\<A NAME\="parties"\>([\s\S]*?)\<A NAME\="violations"\>/gim, '<A NAME="violations">');
+    //html = html.replace(/\<A NAME\="parties"\>([\s\S]*?)\<A NAME\="violations"\>/gim, '<A NAME="violations">');
   }
+  
+  // remove case parties, violations, and sentence sections to prevent erroneous updates
+  html = html.replace(/\<A NAME\="parties"\>([\s\S]*?)\<A NAME\="dockets"\>/gim, '<A NAME="dockets">');
   
   // remove html tags but not white space
   html = html.replace(/<(?:.|\n)*?>/gm, '');
