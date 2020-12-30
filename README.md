@@ -16,6 +16,11 @@ Apps Script has [quotas](https://developers.google.com/apps-script/guides/servic
 
 
 ## Changelog & Updates
+[v7.0](https://github.com/bcrawfo01/docketMonitor/blob/c277c86c1d189008d8b43adf2b727d7b26982631/docketMonitor.gs)<br>
+&nbsp; &bull; Modified error handling to ignore server timeouts<br>
+&nbsp; &bull; Fixed faulty updates based on blank responses<br>
+&nbsp; &bull; Case parties, violations, and sentence sections will no longer be checked for changes<br>
+
 [v6.0](https://github.com/bcrawfo01/docketMonitor/blob/0c98a16f39dc32052ac6423ae6d012a9c633ab6e/docketMonitor.gs)<br>
 &nbsp; &bull; Updated CourtConnect url<br>
 
